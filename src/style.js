@@ -1,13 +1,13 @@
 import { css } from 'lit-element';
 
 const style = css`
-    .github-card {
+    .travel-time-card {
         display: flex;
         padding: 0 16px 4px;
         flex-direction: column;
     }
 
-    .github-card .header {
+    .travel-time-card .header {
         font-family: var(--paper-font-headline_-_font-family);
         -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
         font-size: var(--paper-font-headline_-_font-size);
@@ -19,64 +19,26 @@ const style = css`
         padding: 24px 0px 0px;    
     }
 
-    .github-card__body {
+    .travel-time-card .body {
         margin-bottom: 10px;
         margin-top: 10px;
     }
 
-    .github-card__body .issue {
-        display:flex;
-        justify-content: space-between;
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-    
-    .github-card__body .issue .name {
-        min-width: 40%;
-        word-break: break-all;
+    .travel-time-card .body table {
+
     }
 
-    .github-card__body .issue .name .property {
-        display:flex;
-        font-size: 1.1em;
-        cursor: pointer;
+    .travel-time-card .body table th,
+    .travel-time-card .body table td {
+        padding: 10px 10px 10px 10px;
     }
 
-    .github-card__body .issue .name .property .issue-name {
-        padding-left: 5px;
-        padding-top: 2px;
+    .travel-time-card .body table thead {
+        text-align: left;
     }
 
-    .github-card__body .issue .links {
-        display:flex;
-        justify-content: flex-end;
-        padding-left: 5px;
-        min-width: 50%;
-        max-width: 200px;
-    }
-    
-    .github-card__body .links .property {
-        display:flex;
-        cursor: pointer;
-        flex-direction: column;
-        padding-right: 5px;
-    }
-
-    .github-card__body .links .property:last-child {
-        padding-right: 0px;
-    }
-
-    .github-card__body .links .property .hidden {
-        display:none;
-    }
-
-    .github-card__body .links .property > span {
-        padding-bottom: 5px;
-    }
-
-    .github-card__body ha-icon {
-        color: var(--primary-color);
-        font-size: 1.2em;
+    .travel-time-card .body table tbody {
+        text-align: left;
     }
 `;
 

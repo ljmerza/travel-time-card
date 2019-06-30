@@ -1,9 +1,0 @@
-{
-  "travel-time-card": {
-    "updated_at": "2019-04-09",
-    "version": "1.0.0",
-    "remote_location": "https://raw.githubusercontent.com/ljmerza/travel-time-card/master/travel-time-card.js",
-    "visit_repo": "https://github.com/ljmerza/travel-time-card",
-    "changelog": "https://github.com/ljmerza/travel-time-card/releases/latest"
-  }
-}

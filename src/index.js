@@ -3,11 +3,14 @@ import '@babel/polyfill';
 import { LitElement, html } from 'lit-element';
 import style from './style';
 
-import GithubCardEditor from './index-editor';
-customElements.define('github-card-editor', GithubCardEditor);
+import TravelTimeEditor from './index-editor';
+import TravelTimeEntity from './travel-time';
+
+import defaultConfig from './defaults';
+customElements.define('travel-time-card-editor', TravelTimeEditor);
 
 
-class GithubCard extends LitElement {
+class TravelTime extends LitElement {
   static get properties() {
     return {
       hass: Object,
@@ -17,19 +20,17 @@ class GithubCard extends LitElement {
 
   constructor() {
     super();
-    this.githubBaseUrl = 'https://github.com';
   }
 
   static async getConfigElement() {
-    return document.createElement("github-card-editor");
+    return document.createElement("travel-time-card-editor");
   }
 
   setConfig(config) {
     if (!config.entities) throw Error('entities required.');
-    
+
     this.config = {
-      title: 'Github',
-      show_extended: true,
+      ...defaultConfig,
       ...config,
     };
   }
@@ -39,9 +40,7 @@ class GithubCard extends LitElement {
    * @return {Number}
    */
   getCardSize() {
-    const baseSize = 3.5;
-    const reposSize = this.config.entites * (this.config.show_extended ? 2 : 1);
-    return Math.round(baseSize * reposSize);
+    return 1;
   }
 
   static get styles() {
@@ -53,93 +52,78 @@ class GithubCard extends LitElement {
    * @return {TemplateResult}
    */
   render() {
-    const github = this.issues.map(issue => html`
-        <div class='issue'>
-          <div class="name">
-            <span class='property' @click=${() => this.openLink(`${issue.attributes.path}`)}  title='Open repository'>
-              <ha-icon icon="${issue.attributes.icon}"></ha-icon>
-              <span class='issue-name'>${issue.attributes.name}</span>
-            </span>
-          </div>
-
-          <div></div>
-
-          <div class="links">
-            <div class='property'>
-              <span @click=${() => this.openLink(`${issue.attributes.path}/issues`)} title='Open issues'>
-                <ha-icon icon="mdi:alert-circle-outline"></ha-icon>
-                <span>${issue.attributes.open_issues}</span>
-              </span>
-              <span 
-                class='${this.config.show_extended ? '' : 'hidden'}' 
-                @click=${() => this.openLink(`${issue.attributes.path}/releases`)} 
-                title='Open releases'
-              >
-                <ha-icon icon="mdi:tag-outline"></ha-icon>
-              </span>
-            </div>
-
-            <div class='property'>
-              <span @click=${() => this.openLink(`${issue.attributes.path}/pulls`)} title='Open pull requests'>
-                <ha-icon icon="mdi:source-pull"></ha-icon>
-                <span>${issue.attributes.open_pull_requests}</span>
-              </span>
-              <span 
-                class='${this.config.show_extended ? '' : 'hidden'}' 
-                @click=${() => this.openLink(`${issue.attributes.path}/network/members`)} 
-                title='Open forks'
-              >
-                <ha-icon icon="mdi:source-fork"></ha-icon>
-              </span>
-            </div>
-
-            <div class='property'>
-              <span @click=${() => this.openLink(`${issue.attributes.path}/stargazers`)} title='Open stargazers'>
-                <ha-icon icon="mdi:star"></ha-icon>
-                <span>${issue.attributes.stargazers}</span>
-              </span>
-              <span 
-                class='${this.config.show_extended ? '' : 'hidden'}' 
-                @click=${() => this.openLink(`${issue.attributes.path}/commits`)} 
-                title='Open commits'
-              >
-                <ha-icon icon="mdi:clock-outline"></ha-icon>
-              </span>
-            </div>
-
-          </div>
-        </div>
-      `);
+    console.log({hass: this.hass, config: this.config});
 
     return html`
-      <ha-card class='github-card'>
-        <style>${GithubCard.styles}</style>
-        <div class='header'>
-          ${this.config.title}
-        </div>
-        <div class='github-card__body'>
-          ${github}
+      <ha-card class='travel-time-card'>
+        <style>${TravelTime.styles}</style>
+        ${this.config.show_header ? 
+          html`
+            <div class='header'>
+              ${this.config.title}
+            </div>
+          ` 
+          : null
+        }
+        <div class='body'>
+          ${this.renderBody()}
         </div>
       </ha-card>
     `;
   }
 
-  /**
-   * open a link in github
-   * @param {string} link
-   */
-  openLink(link) {
-    window.open(`${this.githubBaseUrl}/${link}`);
+  renderBody() {
+    const entites = this.getEntities();
+    console.log({entites})
+
+    const body = entites.map(entity => {
+      return html`
+        <tr>
+          ${this.config.rows.includes('name') ? html`<td>${entity.name}</td>` : null}
+          ${this.config.rows.includes('duration') ? html`<td>${entity.travelTime} ${entity.unitsOfMeasurement}</td>` : null}
+          ${this.config.rows.includes('distance') ? html`<td>${entity.distance}</td>` : null}
+          ${this.config.rows.includes('route') ? html`<td>${entity.route}</td>` : null}
+        <tr>
+      `;
+    });
+
+    return html`
+      <table>
+        ${this.renderBodyHeader()}
+        <tbody>
+          ${body}
+        </tbody>
+      </table>
+    `;
+  }
+
+  renderBodyHeader() {
+    return html`
+      <thead>
+        <tr>
+          ${this.config.rows.includes('name') ? html`<th>Name</th>` : null}
+          ${this.config.rows.includes('duration') ? html`<th>Duration</th>` : null}
+          ${this.config.rows.includes('distance') ? html`<th>Distance</th>` : null}
+          ${this.config.rows.includes('route') ? html`<th>Route</th>` : null}
+        </tr>
+      <thead>
+    `;
   }
 
   /**
-   * get amtching issue sensors
+   * gets a list of entiy states from the config list of entities
+   * @return {Entities[]}
    */
-  get issues() {
-    return this.config.entities
-      .map(entity => this.hass.states[entity])
-      .filter(issue => issue);
+  getEntities(){
+    return this.config.entities.reduce((entities, entity) => {
+      const entityName = entity.entity || entity;
+      const entityState = this.hass.states[entityName];
+      if (entityState) entities.push(new TravelTimeEntity(entityState, this.config) );
+      return entities;
+    }, []);
   }
 }
 
-customElements.define('github-card', GithubCard);
+customElements.define('travel-time-card', TravelTime);
+
+
