@@ -13692,7 +13692,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
     show_header :true,
     title: 'Travel Times',
-    rows: ['name', 'duration', 'distance', 'route']
+    columns: ['name', 'duration', 'distance', 'route'],
+    entites: [],
 });
 
 /***/ }),
@@ -13864,6 +13865,9 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
 
   constructor() {
     super();
+    
+    this.wazeBaseUrl = 'https://www.waze.com/ul?navigate=yes&ll=';
+    this.googleMapsBaseUrl = 'https://www.waze.com/ul?navigate=yes&ll=';
   }
 
   static async getConfigElement() {
@@ -13871,8 +13875,6 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
   }
 
   setConfig(config) {
-    if (!config.entities) throw Error('entities required.');
-
     this.config = {
       ..._defaults__WEBPACK_IMPORTED_MODULE_5__["default"],
       ...config,
@@ -13884,7 +13886,10 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
    * @return {Number}
    */
   getCardSize() {
-    return 1;
+    const headerHeight = (this.config && this.config.header) ? 1 : 0;
+    const tableHeight = (this.config && this.config.entities.length) ? 1 : 0;
+
+    return headerHeight + tableHeight;
   }
 
   static get styles() {
@@ -13916,6 +13921,20 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
     `;
   }
 
+  /**
+   * 
+   * @param {*} event 
+   */
+  openRoute(event) {
+    const baseUrl = this.config.map === _defaults__WEBPACK_IMPORTED_MODULE_5__["default"].map ? this.googleMapsBaseUrl : this.wazeBaseUrl;
+    window.open(`${baseUrl}${event.params}`);
+
+  }
+
+  /**
+   * generates the card body
+   * @return {TemplateResult}
+   */
   renderBody() {
     const entites = this.getEntities();
     console.log({entites})
@@ -13923,10 +13942,10 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
     const body = entites.map(entity => {
       return lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`
         <tr>
-          ${this.config.rows.includes('name') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.name}</td>` : null}
-          ${this.config.rows.includes('duration') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.travelTime} ${entity.unitsOfMeasurement}</td>` : null}
-          ${this.config.rows.includes('distance') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.distance}</td>` : null}
-          ${this.config.rows.includes('route') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.route}</td>` : null}
+          ${this.config.columns.includes('name') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.name}</td>` : null}
+          ${this.config.columns.includes('duration') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.travelTime} ${entity.unitsOfMeasurement}</td>` : null}
+          ${this.config.columns.includes('distance') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.distance}</td>` : null}
+          ${this.config.columns.includes('route') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.route}</td>` : null}
         <tr>
       `;
     });
@@ -13941,14 +13960,18 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
     `;
   }
 
+/**
+ * generates the card body header
+ * @return {TemplateResult}
+ */
   renderBodyHeader() {
     return lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`
       <thead>
         <tr>
-          ${this.config.rows.includes('name') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<th>Name</th>` : null}
-          ${this.config.rows.includes('duration') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<th>Duration</th>` : null}
-          ${this.config.rows.includes('distance') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<th>Distance</th>` : null}
-          ${this.config.rows.includes('route') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<th>Route</th>` : null}
+          ${this.config.columns.includes('name') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<th>Name</th>` : null}
+          ${this.config.columns.includes('duration') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<th>Duration</th>` : null}
+          ${this.config.columns.includes('distance') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<th>Distance</th>` : null}
+          ${this.config.columns.includes('route') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<th>Route</th>` : null}
         </tr>
       <thead>
     `;

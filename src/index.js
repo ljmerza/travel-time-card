@@ -20,6 +20,9 @@ class TravelTime extends LitElement {
 
   constructor() {
     super();
+    
+    this.wazeBaseUrl = 'https://www.waze.com/ul?navigate=yes&ll=';
+    this.googleMapsBaseUrl = 'https://www.waze.com/ul?navigate=yes&ll=';
   }
 
   static async getConfigElement() {
@@ -27,8 +30,6 @@ class TravelTime extends LitElement {
   }
 
   setConfig(config) {
-    if (!config.entities) throw Error('entities required.');
-
     this.config = {
       ...defaultConfig,
       ...config,
@@ -40,7 +41,10 @@ class TravelTime extends LitElement {
    * @return {Number}
    */
   getCardSize() {
-    return 1;
+    const headerHeight = (this.config && this.config.header) ? 1 : 0;
+    const tableHeight = (this.config && this.config.entities.length) ? 1 : 0;
+
+    return headerHeight + tableHeight;
   }
 
   static get styles() {
@@ -72,6 +76,20 @@ class TravelTime extends LitElement {
     `;
   }
 
+  /**
+   * 
+   * @param {*} event 
+   */
+  openRoute(event) {
+    const baseUrl = this.config.map === defaultConfig.map ? this.googleMapsBaseUrl : this.wazeBaseUrl;
+    window.open(`${baseUrl}${event.params}`);
+
+  }
+
+  /**
+   * generates the card body
+   * @return {TemplateResult}
+   */
   renderBody() {
     const entites = this.getEntities();
     console.log({entites})
@@ -79,10 +97,10 @@ class TravelTime extends LitElement {
     const body = entites.map(entity => {
       return html`
         <tr>
-          ${this.config.rows.includes('name') ? html`<td>${entity.name}</td>` : null}
-          ${this.config.rows.includes('duration') ? html`<td>${entity.travelTime} ${entity.unitsOfMeasurement}</td>` : null}
-          ${this.config.rows.includes('distance') ? html`<td>${entity.distance}</td>` : null}
-          ${this.config.rows.includes('route') ? html`<td>${entity.route}</td>` : null}
+          ${this.config.columns.includes('name') ? html`<td>${entity.name}</td>` : null}
+          ${this.config.columns.includes('duration') ? html`<td>${entity.travelTime} ${entity.unitsOfMeasurement}</td>` : null}
+          ${this.config.columns.includes('distance') ? html`<td>${entity.distance}</td>` : null}
+          ${this.config.columns.includes('route') ? html`<td>${entity.route}</td>` : null}
         <tr>
       `;
     });
@@ -97,14 +115,18 @@ class TravelTime extends LitElement {
     `;
   }
 
+/**
+ * generates the card body header
+ * @return {TemplateResult}
+ */
   renderBodyHeader() {
     return html`
       <thead>
         <tr>
-          ${this.config.rows.includes('name') ? html`<th>Name</th>` : null}
-          ${this.config.rows.includes('duration') ? html`<th>Duration</th>` : null}
-          ${this.config.rows.includes('distance') ? html`<th>Distance</th>` : null}
-          ${this.config.rows.includes('route') ? html`<th>Route</th>` : null}
+          ${this.config.columns.includes('name') ? html`<th>Name</th>` : null}
+          ${this.config.columns.includes('duration') ? html`<th>Duration</th>` : null}
+          ${this.config.columns.includes('distance') ? html`<th>Distance</th>` : null}
+          ${this.config.columns.includes('route') ? html`<th>Route</th>` : null}
         </tr>
       <thead>
     `;
