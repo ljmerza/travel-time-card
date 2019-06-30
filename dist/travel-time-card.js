@@ -14056,6 +14056,10 @@ const style = lit_element__WEBPACK_IMPORTED_MODULE_0__["css"]`
     .travel-time-card .body table tbody {
         text-align: left;
     }
+
+    .pointer {
+        cursor: pointer; 
+    }
 `;
 
 /* harmony default export */ __webpack_exports__["default"] = (style);

@@ -40,6 +40,10 @@ const style = css`
     .travel-time-card .body table tbody {
         text-align: left;
     }
+
+    .pointer {
+        cursor: pointer; 
+    }
 `;
 
 export default style;
