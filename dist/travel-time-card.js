@@ -13682,11 +13682,12 @@ try {
 /*!*************************!*\
   !*** ./src/defaults.js ***!
   \*************************/
-/*! exports provided: default */
+/*! exports provided: default, validMaps */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "validMaps", function() { return validMaps; });
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -13694,7 +13695,10 @@ __webpack_require__.r(__webpack_exports__);
     title: 'Travel Times',
     columns: ['name', 'duration', 'distance', 'route'],
     entites: [],
+    map: 'google',
 });
+
+const validMaps = ['google', 'waze'];
 
 /***/ }),
 
@@ -13879,6 +13883,10 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
       ..._defaults__WEBPACK_IMPORTED_MODULE_5__["default"],
       ...config,
     };
+
+    if (!_defaults__WEBPACK_IMPORTED_MODULE_5__["validMaps"].includes(this.config.map)) {
+      throw Error(`Invalid map selection: ${this.config.map}, must be one of: ${_defaults__WEBPACK_IMPORTED_MODULE_5__["validMaps"].join(',')}`);
+    }
   }
 
   /**
@@ -13901,7 +13909,6 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
    * @return {TemplateResult}
    */
   render() {
-    console.log({hass: this.hass, config: this.config});
 
     return lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`
       <ha-card class='travel-time-card'>
@@ -13937,14 +13944,13 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
    */
   renderBody() {
     const entites = this.getEntities();
-    console.log({entites})
 
     const body = entites.map(entity => {
       return lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`
-        <tr>
+        <tr @click=${() => this.openRoute(entity)}>
           ${this.config.columns.includes('name') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.name}</td>` : null}
-          ${this.config.columns.includes('duration') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.travelTime} ${entity.unitsOfMeasurement}</td>` : null}
-          ${this.config.columns.includes('distance') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.distance}</td>` : null}
+          ${this.config.columns.includes('duration') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.time} ${entity.timeMeasurement}</td>` : null}
+          ${this.config.columns.includes('distance') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.distance} ${entity.distanceMeasurement}</td>` : null}
           ${this.config.columns.includes('route') ? lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`<td>${entity.route}</td>` : null}
         <tr>
       `;
@@ -13960,10 +13966,10 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
     `;
   }
 
-/**
- * generates the card body header
- * @return {TemplateResult}
- */
+  /**
+   * generates the card body header
+   * @return {TemplateResult}
+   */
   renderBodyHeader() {
     return lit_element__WEBPACK_IMPORTED_MODULE_1__["html"]`
       <thead>
@@ -13979,15 +13985,23 @@ class TravelTime extends lit_element__WEBPACK_IMPORTED_MODULE_1__["LitElement"] 
 
   /**
    * gets a list of entiy states from the config list of entities
-   * @return {Entities[]}
+   * @return {TravelTimeEntity[]}
    */
   getEntities(){
     return this.config.entities.reduce((entities, entity) => {
       const entityName = entity.entity || entity;
       const entityState = this.hass.states[entityName];
-      if (entityState) entities.push(new _travel_time__WEBPACK_IMPORTED_MODULE_4__["default"](entityState, this.config) );
+      if (entityState) entities.push(new _travel_time__WEBPACK_IMPORTED_MODULE_4__["default"](entityState, this.config, this.hass.config.unit_system) );
       return entities;
     }, []);
+  }
+
+  /**
+   * 
+   * @param {TravelTimeEntity} entity
+   */
+  openRoute(entity){
+    console.log(entity);
   }
 }
 
@@ -14103,38 +14117,69 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class TravelTimeEntity {
-    constructor(entity, config) {
+    constructor(entity, config, unit_system) {
         this._entity = entity;
         this._config = config;
+        this._unit_system = unit_system;
         this._entityConfig = config.entities.find(confEntity => (confEntity.entity || confEntity) === entity.entity_id) || {};
     }
 
     get isGoogle() {
-
+        return this._entity.attributes.destination_addresses;
     }
 
     get isWaze() {
-
-    }
-
-    get travelTime() {
-        return this._entity.state;
-    }
-
-    get unitsOfMeasurement() {
-        return this._entity.attributes.unit_of_measurement;
-    }
-
-    get units() {
-        return this._entity.attributes.units;
+        return /Powered by Waze/i.test(this._entity.attributes.attribution);
     }
 
     get name() {
         return this._entity.attributes.friendly_name;
     }
 
+    get time() {
+        let time = this._entity.state || 0;
+
+        if (this.isGoogle){
+            time = this._entity.attributes.duration.replace(/mins$/, 'min');
+        } else if (this.isWaze) {
+            time = isNaN(this._entity.attributes.duration) ? 0 : this._entity.attributes.duration.toFixed(1);
+        }
+
+        return !!parseInt(time) ? time : 0;
+    }
+
+    get timeMeasurement() {
+        if (this.isGoogle) return '';
+        return this._entity.attributes.unit_of_measurement || '';
+    }
+
     get distance() {
-        return this._entity.attributes.distance;
+        let distance = this._entity.attributes.distance || 0;
+
+        if (this.isWaze){
+            distance = isNaN(this._entity.attributes.distance) ? 0 : this._entity.attributes.distance.toFixed(1);
+        }
+
+        return !!parseInt(distance) ? distance : 0;
+    }
+
+    get distanceMeasurement() {
+        if(this.isGoogle) return '';
+
+        return this._entity.attributes.units || this._unit_system.length || '';
+    }
+
+    get route() {
+        return this._entity.attributes.route || '';
+    }
+
+    get destinationAddress() {
+        if (this._entity.attributes.destination_addresses && this._entity.attributes.destination_addresses.length) return this._entity.attributes.destination_addresses[0];
+        return '';
+    }
+
+    get icon() {
+        return this._entity.attributes.icon || 'mdi:car';
     }
 }
 

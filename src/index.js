@@ -6,7 +6,7 @@ import style from './style';
 import TravelTimeEditor from './index-editor';
 import TravelTimeEntity from './travel-time';
 
-import defaultConfig from './defaults';
+import defaultConfig, { validMaps } from './defaults';
 customElements.define('travel-time-card-editor', TravelTimeEditor);
 
 
@@ -34,6 +34,10 @@ class TravelTime extends LitElement {
       ...defaultConfig,
       ...config,
     };
+
+    if (!validMaps.includes(this.config.map)) {
+      throw Error(`Invalid map selection: ${this.config.map}, must be one of: ${validMaps.join(',')}`);
+    }
   }
 
   /**
@@ -56,7 +60,6 @@ class TravelTime extends LitElement {
    * @return {TemplateResult}
    */
   render() {
-    console.log({hass: this.hass, config: this.config});
 
     return html`
       <ha-card class='travel-time-card'>
@@ -92,14 +95,13 @@ class TravelTime extends LitElement {
    */
   renderBody() {
     const entites = this.getEntities();
-    console.log({entites})
 
     const body = entites.map(entity => {
       return html`
-        <tr>
+        <tr @click=${() => this.openRoute(entity)}>
           ${this.config.columns.includes('name') ? html`<td>${entity.name}</td>` : null}
-          ${this.config.columns.includes('duration') ? html`<td>${entity.travelTime} ${entity.unitsOfMeasurement}</td>` : null}
-          ${this.config.columns.includes('distance') ? html`<td>${entity.distance}</td>` : null}
+          ${this.config.columns.includes('duration') ? html`<td>${entity.time} ${entity.timeMeasurement}</td>` : null}
+          ${this.config.columns.includes('distance') ? html`<td>${entity.distance} ${entity.distanceMeasurement}</td>` : null}
           ${this.config.columns.includes('route') ? html`<td>${entity.route}</td>` : null}
         <tr>
       `;
@@ -115,10 +117,10 @@ class TravelTime extends LitElement {
     `;
   }
 
-/**
- * generates the card body header
- * @return {TemplateResult}
- */
+  /**
+   * generates the card body header
+   * @return {TemplateResult}
+   */
   renderBodyHeader() {
     return html`
       <thead>
@@ -134,15 +136,23 @@ class TravelTime extends LitElement {
 
   /**
    * gets a list of entiy states from the config list of entities
-   * @return {Entities[]}
+   * @return {TravelTimeEntity[]}
    */
   getEntities(){
     return this.config.entities.reduce((entities, entity) => {
       const entityName = entity.entity || entity;
       const entityState = this.hass.states[entityName];
-      if (entityState) entities.push(new TravelTimeEntity(entityState, this.config) );
+      if (entityState) entities.push(new TravelTimeEntity(entityState, this.config, this.hass.config.unit_system) );
       return entities;
     }, []);
+  }
+
+  /**
+   * 
+   * @param {TravelTimeEntity} entity
+   */
+  openRoute(entity){
+    console.log(entity);
   }
 }
 
