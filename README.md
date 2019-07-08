@@ -34,7 +34,7 @@ Note: some travel time sensors such as Waze do not come with the destination add
 ---
 | Name | Type | Requirement | `Default` Description
 | :---- | :---- | :------- | :----------- |
-| entites | list | **Required** | `` List of entities to show (see entity config below)
+| entites | list | **Required** | List of entities to show (see entity config below)
 | title | string | **Optional** | `Github` Change card title
 | show_header | boolean | **Optional** | `true` Show or hide header
 | columns | list | **Optional** | `['name', 'duration', 'distance', 'route']` Customize what columns are shown
@@ -42,8 +42,8 @@ Note: some travel time sensors such as Waze do not come with the destination add
 
 | Name | Type | Requirement | `Default` Description
 | :---- | :---- | :------- | :----------- |
-| entity | string | **Required** | `` The travel time entity id
-| zone | string | **Optional** | `` Override the destination route with a zone or add one if none is given from entitiy
+| entity | string | **Required** | The travel time entity id
+| zone | string | **Optional** | Override the destination route with a zone or add one if none is given from entitiy
 
 ---
 
