@@ -1,64 +1,60 @@
-# Github Card for Home Assistant
+# Travel Time Card for Home Assistant
+Show travel time data and open rotues to Google Maps or Waze
 
-<img src='card.png' />
+<img src='https://raw.githubusercontent.com/ljmerza/travel-time-card/master/card.png' />
 
 [![GitHub Release][releases-shield]][releases]
 [![License][license-shield]](LICENSE.md)
-
 ![Project Maintenance][maintenance-shield]
-[![GitHub Activity][commits-shield]][commits]
 
-## Track Updates
-
-This custom card can be tracked with the help of [custom-updater](https://github.com/custom-components/custom_updater).
-
-In your configuration.yaml
-
-```yaml
-custom_updater:
-  card_urls:
-    - https://raw.githubusercontent.com/ljmerza/github-card/master/custom_updater.json
-```
-
-## Options
-
-| Name | Type | Requirement | `Default` Description
-| :---- | :---- | :------- | :----------- |
-| title | string | **Optional** | `Github` Change card title
-| entities | list | **Required** | List of github sensors to display
-| show_extended | boolean | **Optional** | `true` Show/hide tags, forks, and commits links
-
-## Configuration
-
-Download `github-card.js` from the [latest release](https://github.com/ljmerza/github-card/releases/latest/) and upload it your /www folder of your Home Assistant config directory.
-
-In your ui-lovelace.yaml
+## Installation through [HACS](https://github.com/custom-components/hacs)
+---
+Add the following to resources in your lovelace config:
 
 ```yaml
 resources:
-  - url: /local/github-card.js?v=1.2.0
-    type: js
+  - url: /community_plugin/travel-time-card/travel-time-card.js
+  - type: js
 ```
 
-Add the custom card to views:
-
+## Configurations:
+---
 ```yaml
-views:
-  - type: custom:github-card
-    entities:
-    - sensor.calendar_card
-    - sensor.waze_card
-    - sensor.light_entity_card
+type: 'custom:travel-time-card'
+entities:
+  - entity: sensor.google_leo_home
+  - entity: sensor.google_leo_work
+  - entity: sensor.waze_leo_work
+    zone: zone.leo_work
+  - entity: sensor.waze_leo_home
 ```
+Note: some travel time sensors such as Waze do not come with the destination address with it so you'll need to specify it manually via the `zone` setting for an entity. You can also set a custom `zone` for any entity to override the destination address.
+
+## Options
+---
+| Name | Type | Requirement | `Default` Description
+| :---- | :---- | :------- | :----------- |
+| entites | list | **Required** | `` List of entities to show (see entity config below)
+| title | string | **Optional** | `Github` Change card title
+| show_header | boolean | **Optional** | `true` Show or hide header
+| columns | list | **Optional** | `['name', 'duration', 'distance', 'route']` Customize what columns are shown
+| map | string | **Optional** | `google` Open to google or waze maps when a route is clicked (google or waze only) 
+
+| Name | Type | Requirement | `Default` Description
+| :---- | :---- | :------- | :----------- |
+| entity | string | **Required** | `` The travel time entity id
+| zone | string | **Optional** | `` Override the destination route with a zone or add one if none is given from entitiy
+
+---
 
 Enjoy my card? Help me out for a couple of :beers: or a :coffee:!
 
 [![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/JMISm06AD)
 
 
-[commits-shield]: https://img.shields.io/github/commit-activity/y/ljmerza/github-card.svg?style=for-the-badge
-[commits]: https://github.com/ljmerza/github-card/commits/master
-[license-shield]: https://img.shields.io/github/license/ljmerza/github-card.svg?style=for-the-badge
+[commits-shield]: https://img.shields.io/github/commit-activity/y/ljmerza/travel-time-card.svg?style=for-the-badge
+[commits]: https://github.com/ljmerza/travel-time-card/commits/master
+[license-shield]: https://img.shields.io/github/license/ljmerza/travel-time-card.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Leonardo%20Merza%20%40ljmerza-blue.svg?style=for-the-badge
-[releases-shield]: https://img.shields.io/github/release/ljmerza/github-card.svg?style=for-the-badge
-[releases]: https://github.com/ljmerza/github-card/releases
+[releases-shield]: https://img.shields.io/github/release/ljmerza/travel-time-card.svg?style=for-the-badge
+[releases]: https://github.com/ljmerza/travel-time-card/releases

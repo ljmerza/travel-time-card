@@ -1,11 +1,21 @@
 
 
 export default class TravelTimeEntity {
-    constructor(entity, config, unit_system) {
+    constructor(entity, config, hass) {
         this._entity = entity;
         this._config = config;
-        this._unit_system = unit_system;
+        this._unit_system = hass.config.unit_system;
+
         this._entityConfig = config.entities.find(confEntity => (confEntity.entity || confEntity) === entity.entity_id) || {};
+        this._zoneConfig = this._entityConfig.zone && hass.states[this._entityConfig.zone];
+    }
+
+    get zone() {
+        if (this._zoneConfig){
+            return `${this._zoneConfig.attributes.latitude},${this._zoneConfig.attributes.longitude}`;
+        }
+        
+        return '';
     }
 
     get isGoogle() {

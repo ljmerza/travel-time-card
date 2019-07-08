@@ -21,13 +21,18 @@ class TravelTime extends LitElement {
   constructor() {
     super();
     
-    this.wazeBaseUrl = 'https://www.waze.com/ul?navigate=yes&ll=';
-    this.googleMapsBaseUrl = 'https://www.waze.com/ul?navigate=yes&ll=';
+    this.wazeBaseUrl = 'https://www.waze.com/ul?navigate=yes&';
+    this.wazeSearchByLL = `latlng=`;
+    this.wazeSearchByQuery = `q=`;
+
+    this.googleMapsBaseUrl = 'https://maps.google.com/?';
+    this.googleSearchByLL = `daddr=`;
+    this.googleSearchByQuery = `daddr=`;
   }
 
-  static async getConfigElement() {
-    return document.createElement("travel-time-card-editor");
-  }
+  // static async getConfigElement() {
+  //   return document.createElement("travel-time-card-editor");
+  // }
 
   setConfig(config) {
     this.config = {
@@ -37,6 +42,17 @@ class TravelTime extends LitElement {
 
     if (!validMaps.includes(this.config.map)) {
       throw Error(`Invalid map selection: ${this.config.map}, must be one of: ${validMaps.join(',')}`);
+    }
+
+    if (this.config.map === 'google'){
+      this.baseUrl = this.googleMapsBaseUrl;
+      this.searchByLL = this.googleSearchByLL;
+      this.searchByQuery = this.googleSearchByQuery;
+
+    } else {
+      this.baseUrl = this.wazeBaseUrl;
+      this.searchByLL = this.wazeSearchByLL;
+      this.searchByQuery = this.wazeSearchByQuery;
     }
   }
 
@@ -80,13 +96,30 @@ class TravelTime extends LitElement {
   }
 
   /**
-   * 
-   * @param {*} event 
+   * finds the url for a route and opens it if we can find it
+   * @param {TravelTimeEntity} entity
    */
-  openRoute(event) {
-    const baseUrl = this.config.map === defaultConfig.map ? this.googleMapsBaseUrl : this.wazeBaseUrl;
-    window.open(`${baseUrl}${event.params}`);
+  openRoute(entity) {
+    let url = ``;
 
+    // config zone overrides everything then search by lat/long because it's more accurate, finally search by address
+    if (entity.zone) {
+      url = `${this.baseUrl}${this.searchByLL}${entity.zone}`;
+
+    } else if (entity._entity.attributes.destination) {
+      const coordinates = entity._entity.attributes.destination;
+      url = `${this.baseUrl}${this.searchByLL}${coordinates}`;
+
+    } else if (entity._entity.attributes.destination_addresses && entity._entity.attributes.destination_addresses.length){
+      const [address] = entity._entity.attributes.destination_addresses;
+      url = `${this.baseUrl}${this.searchByQuery}${address}`;
+    } 
+
+    if (url) {
+      window.open(url); 
+    } else {
+      throw Error(`Could not find an address for ${entity._entity.entity_id}`);
+    }
   }
 
   /**
@@ -98,7 +131,7 @@ class TravelTime extends LitElement {
 
     const body = entites.map(entity => {
       return html`
-        <tr @click=${() => this.openRoute(entity)}>
+        <tr class='pointer' @click=${() => this.openRoute(entity)}>
           ${this.config.columns.includes('name') ? html`<td>${entity.name}</td>` : null}
           ${this.config.columns.includes('duration') ? html`<td>${entity.time} ${entity.timeMeasurement}</td>` : null}
           ${this.config.columns.includes('distance') ? html`<td>${entity.distance} ${entity.distanceMeasurement}</td>` : null}
@@ -142,17 +175,9 @@ class TravelTime extends LitElement {
     return this.config.entities.reduce((entities, entity) => {
       const entityName = entity.entity || entity;
       const entityState = this.hass.states[entityName];
-      if (entityState) entities.push(new TravelTimeEntity(entityState, this.config, this.hass.config.unit_system) );
+      if (entityState) entities.push(new TravelTimeEntity(entityState, this.config, this.hass) );
       return entities;
     }, []);
-  }
-
-  /**
-   * 
-   * @param {TravelTimeEntity} entity
-   */
-  openRoute(entity){
-    console.log(entity);
   }
 }
 
