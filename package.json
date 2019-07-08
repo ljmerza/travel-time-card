@@ -16,20 +16,20 @@
     "author": "Leonardo Merza <ljmerza@gmail.com>",
     "license": "MIT",
     "dependencies": {
-        "@babel/polyfill": "^7.4.3",
-        "lit-element": "^2.1.0"
+        "@babel/polyfill": "^7.4.4",
+        "lit-element": "^2.2.0"
     },
     "devDependencies": {
-        "@babel/cli": "^7.4.3",
-        "@babel/core": "^7.4.3",
+        "@babel/cli": "^7.5.0",
+        "@babel/core": "^7.5.0",
         "@babel/plugin-transform-modules-umd": "^7.2.0",
-        "@babel/preset-env": "^7.4.3",
-        "babel-loader": "^8.0.5",
-        "eslint": "^5.13.0",
-        "eslint-config-airbnb-base": "^13.1.0",
-        "eslint-plugin-import": "^2.16.0",
-        "webpack": "^4.29.6",
-        "webpack-cli": "^3.3.0",
+        "@babel/preset-env": "^7.5.2",
+        "babel-loader": "^8.0.6",
+        "eslint": "^6.0.1",
+        "eslint-config-airbnb-base": "^13.2.0",
+        "eslint-plugin-import": "^2.18.0",
+        "webpack": "^4.35.3",
+        "webpack-cli": "^3.3.5",
         "webpack-merge": "^4.2.1"
     },
     "scripts": {
