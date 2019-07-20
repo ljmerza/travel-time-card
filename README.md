@@ -14,7 +14,7 @@ Add the following to resources in your lovelace config:
 ```yaml
 resources:
   - url: /community_plugin/travel-time-card/travel-time-card.js
-  - type: js
+    type: js
 ```
 
 ## Configurations:
