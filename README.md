@@ -14,7 +14,7 @@ Add the following to resources in your lovelace config:
 ```yaml
 resources:
   - url: /community_plugin/travel-time-card/travel-time-card.js
-  - type: js
+    type: js
 ```
 
 ## Configurations:
@@ -34,7 +34,7 @@ Note: some travel time sensors such as Waze do not come with the destination add
 ---
 | Name | Type | Requirement | `Default` Description
 | :---- | :---- | :------- | :----------- |
-| entites | list | **Required** | List of entities to show (see entity config below)
+| entities | list | **Required** | List of entities to show (see entity config below)
 | title | string | **Optional** | `Github` Change card title
 | show_header | boolean | **Optional** | `true` Show or hide header
 | columns | list | **Optional** | `['name', 'duration', 'distance', 'route']` Customize what columns are shown
