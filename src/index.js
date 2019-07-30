@@ -1,4 +1,4 @@
-import '@babel/polyfill';
+import "core-js/stable";
 
 import { LitElement, html } from 'lit-element';
 import style from './style';
@@ -6,7 +6,8 @@ import style from './style';
 import TravelTimeEditor from './index-editor';
 import TravelTimeEntity from './travel-time';
 
-import defaultConfig, { validMaps } from './defaults';
+import defaultConfig, { validMaps, validUnits } from './defaults';
+
 customElements.define('travel-time-card-editor', TravelTimeEditor);
 
 
@@ -20,14 +21,14 @@ class TravelTime extends LitElement {
 
   constructor() {
     super();
-    
+
     this.wazeBaseUrl = 'https://www.waze.com/ul?navigate=yes&';
-    this.wazeSearchByLL = `latlng=`;
-    this.wazeSearchByQuery = `q=`;
+    this.wazeSearchByLL = 'latlng=';
+    this.wazeSearchByQuery = 'q=';
 
     this.googleMapsBaseUrl = 'https://maps.google.com/?';
-    this.googleSearchByLL = `daddr=`;
-    this.googleSearchByQuery = `daddr=`;
+    this.googleSearchByLL = 'daddr=';
+    this.googleSearchByQuery = 'daddr=';
   }
 
   // static async getConfigElement() {
@@ -44,11 +45,14 @@ class TravelTime extends LitElement {
       throw Error(`Invalid map selection: ${this.config.map}, must be one of: ${validMaps.join(',')}`);
     }
 
-    if (this.config.map === 'google'){
+    if (this.config.distance_units && !validUnits.includes(this.config.distance_units)) {
+      throw Error(`Invalid distance_units selection: ${this.config.distance_units}, must be one of: ${validUnits.join(',')}`);
+    }
+
+    if (this.config.map === 'google') {
       this.baseUrl = this.googleMapsBaseUrl;
       this.searchByLL = this.googleSearchByLL;
       this.searchByQuery = this.googleSearchByQuery;
-
     } else {
       this.baseUrl = this.wazeBaseUrl;
       this.searchByLL = this.wazeSearchByLL;
@@ -76,18 +80,17 @@ class TravelTime extends LitElement {
    * @return {TemplateResult}
    */
   render() {
-
     return html`
       <ha-card class='travel-time-card'>
         <style>${TravelTime.styles}</style>
-        ${this.config.show_header ? 
-          html`
+        ${this.config.show_header
+    ? html`
             <div class='header'>
               ${this.config.title}
             </div>
-          ` 
-          : null
-        }
+          `
+    : null
+}
         <div class='body'>
           ${this.renderBody()}
         </div>
@@ -100,23 +103,20 @@ class TravelTime extends LitElement {
    * @param {TravelTimeEntity} entity
    */
   openRoute(entity) {
-    let url = ``;
+    let url = '';
 
-    // config zone overrides everything then search by lat/long because it's more accurate, finally search by address
+    // config zone overrides everything then search by
+    // lat/long because it's more accurate, finally search by address
     if (entity.zone) {
       url = `${this.baseUrl}${this.searchByLL}${entity.zone}`;
-
-    } else if (entity._entity.attributes.destination) {
-      const coordinates = entity._entity.attributes.destination;
-      url = `${this.baseUrl}${this.searchByLL}${coordinates}`;
-
-    } else if (entity._entity.attributes.destination_addresses && entity._entity.attributes.destination_addresses.length){
-      const [address] = entity._entity.attributes.destination_addresses;
-      url = `${this.baseUrl}${this.searchByQuery}${address}`;
-    } 
+    } else if (entity.destinationCoordinates) {
+      url = `${this.baseUrl}${this.searchByLL}${entity.destinationCoordinates}`;
+    } else if (entity.destinationAddress) {
+      url = `${this.baseUrl}${this.searchByQuery}${entity.destinationAddress}`;
+    }
 
     if (url) {
-      window.open(url); 
+      window.open(url);
     } else {
       throw Error(`Could not find an address for ${entity._entity.entity_id}`);
     }
@@ -129,16 +129,14 @@ class TravelTime extends LitElement {
   renderBody() {
     const entites = this.getEntities();
 
-    const body = entites.map(entity => {
-      return html`
+    const body = entites.map(entity => html`
         <tr class='pointer' @click=${() => this.openRoute(entity)}>
           ${this.config.columns.includes('name') ? html`<td>${entity.name}</td>` : null}
           ${this.config.columns.includes('duration') ? html`<td>${entity.time} ${entity.timeMeasurement}</td>` : null}
           ${this.config.columns.includes('distance') ? html`<td>${entity.distance} ${entity.distanceMeasurement}</td>` : null}
           ${this.config.columns.includes('route') ? html`<td>${entity.route}</td>` : null}
         <tr>
-      `;
-    });
+      `);
 
     return html`
       <table>
@@ -171,16 +169,14 @@ class TravelTime extends LitElement {
    * gets a list of entiy states from the config list of entities
    * @return {TravelTimeEntity[]}
    */
-  getEntities(){
+  getEntities() {
     return this.config.entities.reduce((entities, entity) => {
       const entityName = entity.entity || entity;
       const entityState = this.hass.states[entityName];
-      if (entityState) entities.push(new TravelTimeEntity(entityState, this.config, this.hass) );
+      if (entityState) entities.push(new TravelTimeEntity(entityState, this.config, this.hass));
       return entities;
     }, []);
   }
 }
 
 customElements.define('travel-time-card', TravelTime);
-
-
