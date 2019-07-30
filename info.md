@@ -39,6 +39,7 @@ Note: some travel time sensors such as Waze do not come with the destination add
 | show_header | boolean | **Optional** | `true` Show or hide header
 | columns | list | **Optional** | `['name', 'duration', 'distance', 'route']` Customize what columns are shown
 | map | string | **Optional** | `google` Open to google or waze maps when a route is clicked (google or waze only) 
+| distance_units | string | **Optional** | `` Force conversion of distance units to metric or imperial if needed
 
 | Name | Type | Requirement | `Default` Description
 | :---- | :---- | :------- | :----------- |
