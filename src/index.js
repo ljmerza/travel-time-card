@@ -1,5 +1,4 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
+import '@babel/polyfill/noConflict';
 
 import { LitElement, html } from 'lit-element';
 import style from './style';
@@ -8,6 +7,7 @@ import TravelTimeEditor from './index-editor';
 import TravelTimeEntity from './travel-time';
 
 import defaultConfig, { validMaps, validUnits } from './defaults';
+
 
 customElements.define('travel-time-card-editor', TravelTimeEditor);
 
