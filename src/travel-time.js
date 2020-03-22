@@ -148,6 +148,10 @@ export default class TravelTimeEntity {
       return this._entity.attributes.destination_addresses[0];
     }
 
+    if(this._entity.attributes.destination_name){
+      return this._entity.attributes.destination_name
+    }
+
     return this._entity.attributes.destination_address || '';
   }
 
