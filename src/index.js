@@ -2,6 +2,7 @@ import '@babel/polyfill/noConflict';
 
 import { LitElement, html } from 'lit-element';
 import style from './style';
+import packageJson from '../package.json';
 
 import TravelTimeEditor from './index-editor';
 import TravelTimeEntity from './travel-time';
@@ -10,7 +11,8 @@ import defaultConfig, { validMaps, validUnits } from './defaults';
 
 
 customElements.define('travel-time-card-editor', TravelTimeEditor);
-
+/* eslint no-console: 0 */
+console.info(`%c TRAVEL-TIME-CARD \n%c  Version ${packageJson.version}   `, "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 
 class TravelTime extends LitElement {
   static get properties() {
