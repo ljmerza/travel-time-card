@@ -8,5 +8,5 @@ export default {
   distance_units: '',
 };
 
-export const validMaps = ['google', 'waze'];
+export const validMaps = ['google', 'waze', 'here'];
 export const validUnits = ['km', 'mi'];

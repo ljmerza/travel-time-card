@@ -30,6 +30,10 @@ class TravelTime extends LitElement {
     this.googleMapsBaseUrl = 'https://maps.google.com/?';
     this.googleSearchByLL = 'daddr=';
     this.googleSearchByQuery = 'daddr=';
+
+    this.hereBaseUrl = 'https://wego.here.com/directions/mix//';
+    this.hereSearchByLL = '';
+    this.hereSearchByQuery = '';
   }
 
   // static async getConfigElement() {
@@ -54,6 +58,10 @@ class TravelTime extends LitElement {
       this.baseUrl = this.googleMapsBaseUrl;
       this.searchByLL = this.googleSearchByLL;
       this.searchByQuery = this.googleSearchByQuery;
+    } else if (this.config.map === 'here') {
+      this.baseUrl = this.hereBaseUrl;
+      this.searchByLL = this.hereSearchByLL;
+      this.searchByQuery = this.hereSearchByQuery;
     } else {
       this.baseUrl = this.wazeBaseUrl;
       this.searchByLL = this.wazeSearchByLL;

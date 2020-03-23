@@ -1,5 +1,5 @@
 # Travel Time Card for Home Assistant
-Show travel time data and open rotues to Google Maps or Waze
+Show travel time data and open rotues to Google Maps, Waze or HERE
 
 <img src='https://raw.githubusercontent.com/ljmerza/travel-time-card/master/card.png' />
 
@@ -28,6 +28,7 @@ entities:
   - entity: sensor.waze_leo_work
     zone: zone.leo_work
   - entity: sensor.waze_leo_home
+  - entity: sensor.here_leo_home
 ```
 Note: some travel time sensors such as Waze do not come with the destination address with it so you'll need to specify it manually via the `zone` setting for an entity. You can also set a custom `zone` for any entity to override the destination address.
 
@@ -39,7 +40,7 @@ Note: some travel time sensors such as Waze do not come with the destination add
 | title | string | **Optional** | `Github` Change card title
 | show_header | boolean | **Optional** | `true` Show or hide header
 | columns | list | **Optional** | `['name', 'duration', 'distance', 'route']` Customize what columns are shown
-| map | string | **Optional** | `google` Open to google or waze maps when a route is clicked (google or waze only) 
+| map | string | **Optional** | `google` Open to google, waze or here maps when a route is clicked (google, waze or here only) 
 | distance_units | string | **Optional** | `` Force conversion of distance units to metric or imperial if needed
 
 | Name | Type | Requirement | `Default` Description
