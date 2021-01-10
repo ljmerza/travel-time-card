@@ -33,9 +33,22 @@ export default class TravelTimeEntity {
 
   get time() {
     let time = this._entity.state || 0;
+    let timeHourMinutesRe = new RegExp('^(\\d+) hour (\\d+) mins$', 'ig');
 
     if (this.isGoogle) {
-      time = this._entity.attributes.duration.replace(/mins$/, 'min');
+      // Google will report in x hour 25 min format when travel time is > 60 min
+      // For example: 1 hour 25 mins
+      let duration = this._entity.attributes.duration || "";
+
+      if (duration.includes("hour")) {
+        let result = timeHourMinutesRe.exec(duration);
+
+        if (result) {
+          time = (parseInt(result[1], 10) * 60) + parseInt(result[2], 10);
+        }
+      } else {
+        time = this._entity.attributes.duration.replace(/mins$/, 'min');
+      }
     } else if (this.isWaze) {
       time = parseInt(this._entity.attributes.duration, 10);
       time = Number.isNaN(time) ? 0 : this._entity.attributes.duration.toFixed(1);
