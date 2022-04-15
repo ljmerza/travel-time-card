@@ -1,39 +1,44 @@
 {
-    "name": "travel-time-card",
-    "version": "1.1.3",
-    "description": "A travel time card for Home Assistant Lovelace UI",
-    "keywords": [
-        "home-assistant",
-        "homeassistant",
-        "hass",
-        "automation",
-        "lovelace",
-        "Google Maps",
-        "Travel Time",
-        "custom-cards"
-    ],
-    "repository": "git@github.com:ljmerza/travel-time-card.git",
-    "author": "Leonardo Merza <ljmerza@gmail.com>",
-    "license": "MIT",
-    "dependencies": {
-        "@babel/polyfill": "^7.4.4",
-        "lit-element": "^2.2.1"
-    },
-    "devDependencies": {
-        "@babel/cli": "^7.5.5",
-        "@babel/core": "^7.5.5",
-        "@babel/preset-env": "^7.5.5",
-        "babel-loader": "^8.0.6",
-        "eslint": "^6.1.0",
-        "eslint-config-airbnb-base": "^13.2.0",
-        "eslint-plugin-import": "^2.18.2",
-        "webpack": "^4.38.0",
-        "webpack-cli": "^3.3.6",
-        "webpack-merge": "^4.2.1"
-    },
-    "scripts": {
-        "lint": "eslint  --fix ./src",
-        "start": "webpack --watch --config webpack/config.dev.js",
-        "build": "webpack --config webpack/config.prod.js"
-    }
+  "name": "travel-time-card",
+  "version": "2.0.0",
+  "description": "Travel time card for Home Assistant",
+  "keywords": [
+    "home-assistant",
+    "homeassistant",
+    "hass",
+    "automation",
+    "Google Maps",
+    "Travel Time",
+    "custom-cards"
+  ],
+  "repository": "git@github.com:ljmerza/travel-time-card.git",
+  "author": "Leonardo Merza <ljmerza@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@lit-labs/scoped-registry-mixin": "^1.0.0",
+    "core-js": "^2.6.5",
+    "lit": "^2.1.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-json": "^4.0.3",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "2.16.0",
+    "rollup": "^0.66.6",
+    "rollup-plugin-node-resolve": "^3.4.0"
+  },
+  "resolutions": {
+    "lit": "^2.1.2",
+    "lit-html": "2.1.2",
+    "lit-element": "3.1.2",
+    "@lit/reactive-element": "1.2.1"
+  },
+  "scripts": {
+    "build": "npm run rollup && npm run babel",
+    "rollup": "rollup -c",
+    "babel": "babel dist/travel-time-card.js --out-file dist/travel-time-card.js",
+    "lint": "eslint src/* --ext .js",
+    "watch": "rollup -c --watch",
+    "start": "rollup -c --watch"
+  }
 }
