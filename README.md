@@ -7,9 +7,9 @@ Show travel time data and open rotues to Google Maps, Waze or HERE
 [![GitHub Release][releases-shield]][releases]
 [![License][license-shield]](LICENSE.md)
 ![Project Maintenance][maintenance-shield]
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-Installation through [HACS](https://github.com/custom-components/hacs)
+Installation through [HACS](https://hacs.xyz/)
 
 ## Configurations
 
